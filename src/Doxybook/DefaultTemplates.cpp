@@ -341,7 +341,8 @@ static std::string createTableForTypeLike(const std::string& visibility,
     ss << "{% if not loop.is_last %},{% endif -%}\n";
     ss << "{% endfor %}\\> <br>{% endif -%}\n";
 
-    ss << "{{child.kind}}{% if existsIn(child, \"type\") %} {{child.type}} {% endif -%}\n";
+    ss << "{{child.kind}}{% if child.kind == \"enum\" and child.strong %} class{% endif %}";
+    ss << "{% if existsIn(child, \"type\") %} {{child.type}} {% endif -%}";
 
     ss << "| **[{{child.name}}]({{child.url}})** ";
     ss << "{% if child.kind == \"enum\" %}{ ";
@@ -400,7 +401,7 @@ static std::string createTableForFriendLike(const std::string& title, const std:
 
     ss << "| {% if existsIn(child, \"type\") %}{{child.type}} {% endif -%}\n";
     ss << "| **[{{child.name}}]({{child.url}})**";
-    ss << "{% if child.type != \"class\" -%}\n";
+    ss << "{% if child.type != \"class\" and child.type != \"struct\" -%}\n";
     ss << "({% for param in child.params -%}\n";
     ss << "{{param.type}} {{param.name}}";
     ss << "{% if existsIn(param, \"defval\") %} ={{param.defval}}{% endif -%}\n";
@@ -451,7 +452,7 @@ static std::string createTableForFunctionLike(const std::string& visibility,
     ss << "{% if child.const %} const{% endif -%}\n";
     ss << "{% if child.override %} override{% endif -%}\n";
     ss << "{% if child.default %} =default{% endif -%}\n";
-    ss << "{% if child.deleted %} =deleted{% endif -%}\n";
+    ss << "{% if child.deleted %} =delete{% endif -%}\n";
     ss << "{% if child.pureVirtual %} =0{% endif -%}\n";
 
     ss << " {% if existsIn(child, \"brief\") %}<br>{{child.brief}}{% endif %} |\n";
@@ -608,7 +609,7 @@ template <{% for param in templateParams %}{{param.typePlain}} {{param.name}}{% 
 {% if const %} const{% endif -%}
 {% if override %} override{% endif -%}
 {% if default %} =default{% endif -%}
-{% if deleted %} =deleted{% endif -%}
+{% if deleted %} =delete{% endif -%}
 {% if pureVirtual %} =0{% endif %}
 ```{% endif -%}
 
@@ -690,7 +691,7 @@ static const std::string TEMPLATE_NONCLASS_MEMBERS_DETAILS =
 
 {{ render("member_details", child) }}
 {% endfor %}{% endif %}
-{% if exists("defines") %}## Macro Documentation
+{% if exists("defines") %}## Macros Documentation
 
 {% for child in defines %}### {{child.kind}} {{child.name}}
 
@@ -808,9 +809,7 @@ static const std::string TEMPLATE_KIND_NONCLASS =
 
 {% include "breadcrumbs" -%}
 
-{% if exists("brief") %}{{brief}}{% endif %}{% if hasDetails %} [More...](#detailed-description)
-
-{% endif -%}
+{% if exists("brief") %}{{brief}}{% endif %}{% if hasDetails %} [More...](#detailed-description){% endif %}
 
 {% include "nonclass_members_tables" -%}
 
@@ -827,9 +826,7 @@ static const std::string TEMPLATE_KIND_CLASS =
 
 {% include "breadcrumbs" %}
 
-{% if exists("brief") %}{{brief}}{% endif %}{% if hasDetails %} [More...](#detailed-description)
-
-{% endif -%}
+{% if exists("brief") %}{{brief}}{% endif %}{% if hasDetails %} [More...](#detailed-description){% endif %}
 
 {% if exists("includes") %}
 `#include {{includes}}`
@@ -869,9 +866,7 @@ static const std::string TEMPLATE_KIND_GROUP =
 
 {% include "breadcrumbs" -%}
 
-{% if exists("brief") %}{{brief}}{% endif %}{% if hasDetails %} [More...](#detailed-description)
-
-{% endif -%}
+{% if exists("brief") %}{{brief}}{% endif %}{% if hasDetails %} [More...](#detailed-description){% endif %}
 
 {% include "nonclass_members_tables" -%}
 
@@ -887,9 +882,7 @@ static const std::string TEMPLATE_KIND_GROUP =
 static const std::string TEMPLATE_KIND_FILE =
     R"({% include "header" -%}
 
-{% if exists("brief") %}{{brief}}{% endif %}{% if hasDetails %} [More...](#detailed-description)
-
-{% endif -%}
+{% if exists("brief") %}{{brief}}{% endif %}{% if hasDetails %} [More...](#detailed-description){% endif %}
 
 {% include "nonclass_members_tables" -%}
 

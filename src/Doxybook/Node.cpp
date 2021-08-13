@@ -206,81 +206,7 @@ void Doxybook2::Node::parseBaseInfo(const Xml::Element& element) {
         this->title = this->name;
     }
 
-    switch (kind) {
-        case Kind::DEFINE: {
-            type = Type::DEFINES;
-            break;
-        }
-        case Kind::FRIEND: {
-            type = Type::FRIENDS;
-            break;
-        }
-        case Kind::VARIABLE: {
-            type = Type::ATTRIBUTES;
-            break;
-        }
-        case Kind::FUNCTION: {
-            type = Type::FUNCTIONS;
-            break;
-        }
-        case Kind::ENUMVALUE:
-        case Kind::ENUM:
-        case Kind::USING:
-        case Kind::TYPEDEF: {
-            type = Type::TYPES;
-            break;
-        }
-        case Kind::MODULE: {
-            type = Type::MODULES;
-            break;
-        }
-        case Kind::NAMESPACE: {
-            type = Type::NAMESPACES;
-            break;
-        }
-        case Kind::UNION:
-        case Kind::INTERFACE:
-        case Kind::STRUCT:
-        case Kind::CLASS: {
-            type = Type::CLASSES;
-            break;
-        }
-        case Kind::FILE: {
-            type = Type::FILES;
-            break;
-        }
-        case Kind::DIR: {
-            type = Type::DIRS;
-            break;
-        }
-        case Kind::PAGE: {
-            type = Type::PAGES;
-            break;
-        }
-        case Kind::EXAMPLE: {
-            type = Type::EXAMPLES;
-            break;
-        }
-        case Kind::SIGNAL: {
-            type = Type::SIGNALS;
-            break;
-        }
-        case Kind::SLOT: {
-            type = Type::SLOTS;
-            break;
-        }
-        case Kind::EVENT: {
-            type = Type::EVENTS;
-            break;
-        }
-        case Kind::PROPERTY: {
-            type = Type::PROPERTIES;
-            break;
-        }
-        default: {
-            break;
-        }
-    }
+    type = kindToType(kind);
 }
 
 void Doxybook2::Node::parseInheritanceInfo(const Xml::Element& element) {
@@ -510,7 +436,7 @@ Doxybook2::Node::Data Doxybook2::Node::loadData(const Config& config,
     if (argsstring) {
         data.argsString = markdownPrinter.print(XmlTextParser::parsePara(argsstring));
         data.isDefault = data.argsString.find("=default") != std::string::npos;
-        data.isDeleted = data.argsString.find("=deleted") != std::string::npos;
+        data.isDeleted = data.argsString.find("=delete") != std::string::npos;
         data.isOverride = data.argsString.find(" override") != std::string::npos;
     }
 
